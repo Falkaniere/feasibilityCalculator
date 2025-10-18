@@ -66,9 +66,9 @@ export default function App() {
           />
         </div>
 
-        <button type="submit" className="button" disabled={!canCalc}>
+        {/* <button type="submit" className="button" disabled={!canCalc}>
           Calcular
-        </button>
+        </button> */}
       </form>
 
       <section className="result">
