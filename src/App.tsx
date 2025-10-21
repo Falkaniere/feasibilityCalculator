@@ -16,23 +16,29 @@ export default function App() {
   // a = Itens, b = Itens Rastreados (inteiros)
   const a = useMemo(() => parseInteger(aRaw), [aRaw]);
   const b = useMemo(() => parseInteger(bRaw), [bRaw]);
-  // ticket médio (decimal)
-  const tm = useMemo(() => parseDecimal(tmRaw), [tmRaw]);
+
+  const tmParsed = useMemo(() => {
+    if (tmRaw.trim() === '') return 0;
+    const n = parseDecimal(tmRaw);
+    return Number.isFinite(n) ? n : 0;
+  }, [tmRaw]);
 
   const errors = useMemo(() => {
     const e: Record<string, string | undefined> = {};
     if (touched) {
       if (!isFinite(a)) e.a = 'Informe um inteiro válido';
       if (!isFinite(b)) e.b = 'Informe um inteiro válido';
-      if (!isFinite(tm)) e.tm = 'Informe um número válido';
+      if (tmRaw.trim() !== '' && !Number.isFinite(parseDecimal(tmRaw))) {
+        e.tm = 'Informe um número válido';
+      }
     }
     return e;
-  }, [a, b, tm, touched]);
+  }, [a, b, tmRaw, touched]);
 
-  const canCalc = isFinite(a) && isFinite(b) && isFinite(tm);
+  const canCalc = isFinite(a) && isFinite(b);
   const result = useMemo(
-    () => (canCalc ? computeViability({ a, b, ticketMedio: tm }) : null),
-    [a, b, tm, canCalc]
+    () => (canCalc ? computeViability({ a, b, ticketMedio: tmParsed }) : null),
+    [a, b, tmParsed, canCalc]
   );
 
   return (
@@ -79,76 +85,81 @@ export default function App() {
 
       <section className="result">
         <h2>Resultado</h2>
-        {result ? (
-          <div className="card">
-            <div className="row">
-              <span className="k">TICKET MÉDIO</span>
-              <input
-                className={`v-input ${errors.tm ? 'error' : ''}`}
-                placeholder="Ex.: 158,00"
-                inputMode="decimal"
-                value={tmRaw}
-                onChange={(e) => setTmRaw(e.target.value)}
-                onBlur={() => setTouched(true)}
-                aria-invalid={!!errors.tm}
-                aria-label="Ticket Médio"
-                title={errors.tm || 'Ticket Médio'}
-              />
-            </div>
 
-            <div className="row">
-              <span className="k">FATURAMENTO BRUTO</span>
-              <span className="v">
-                {formatNumber(result.faturamentoBruto, 2)}
-              </span>
-            </div>
-            <div className="row">
-              <span className="k">CUSTO TAG</span>
-              <span className="v">{formatNumber(result.custoTag, 2)}</span>
-            </div>
-            <div className="row">
-              <span className="k">GESTÃO GO SEGUROS</span>
-              <span className="v">
-                {formatNumber(result.gestaoGoSeguros, 2)}
-              </span>
-            </div>
-            <div className="row">
-              <span className="k">ASSISTÊNCIA 24 HORAS</span>
-              <span className="v">
-                {formatNumber(result.assistencia24h, 2)}
-              </span>
-            </div>
-            <div className="row">
-              <span className="k">SETUP / CAUÇÃO / MÊS</span>
-              <span className="v">
-                {formatNumber(result.setupCaucaoMes, 2)}
-              </span>
-            </div>
-            <div className="row">
-              <span className="k">ADM</span>
-              <span className="v">{formatNumber(result.adm, 2)}</span>
-            </div>
-
-            <div className="row">
-              <span className="k">PASSIVO</span>
-              <span className="v">{formatNumber(result.passivo, 2)}</span>
-            </div>
-
-            <div className="row">
-              <span className="k">IOF - TRIBUTOS</span>
-              <span className="v">{formatNumber(result.iofTributos, 2)}</span>
-            </div>
-            <div className="row">
-              <span className="k">RESULTADO CLIENTE</span>
-              <span className="v">
-                {formatNumber(result.resultadoCliente, 2)}
-              </span>
-            </div>
+        <div className="card">
+          <div className="row">
+            <span className="k">TICKET MÉDIO</span>
+            <input
+              className={`v-input ${errors.tm ? 'error' : ''}`}
+              placeholder="Ex.: 158,00"
+              inputMode="decimal"
+              value={tmRaw}
+              onChange={(e) => setTmRaw(e.target.value)}
+              onBlur={() => {
+                setTouched(true);
+                if (tmRaw.trim() === '') setTmRaw('0');
+              }}
+              aria-invalid={!!errors.tm}
+              aria-label="Ticket Médio"
+              title={errors.tm || 'Ticket Médio'}
+            />
           </div>
-        ) : (
-          <p className="muted">
-            Preencha Itens e Itens Rastreados (inteiros) para ver os resultados
-            calculados.
+
+          <div className="row">
+            <span className="k">FATURAMENTO BRUTO</span>
+            <span className="v">
+              {formatNumber(result?.faturamentoBruto ?? NaN, 2)}
+            </span>
+          </div>
+          <div className="row">
+            <span className="k">CUSTO TAG</span>
+            <span className="v">
+              {formatNumber(result?.custoTag ?? NaN, 2)}
+            </span>
+          </div>
+          <div className="row">
+            <span className="k">GESTÃO GO SEGUROS</span>
+            <span className="v">
+              {formatNumber(result?.gestaoGoSeguros ?? NaN, 2)}
+            </span>
+          </div>
+          <div className="row">
+            <span className="k">ASSISTÊNCIA 24 HORAS</span>
+            <span className="v">
+              {formatNumber(result?.assistencia24h ?? NaN, 2)}
+            </span>
+          </div>
+          <div className="row">
+            <span className="k">SETUP / CAUÇÃO / MÊS</span>
+            <span className="v">
+              {formatNumber(result?.setupCaucaoMes ?? NaN, 2)}
+            </span>
+          </div>
+          <div className="row">
+            <span className="k">ADM</span>
+            <span className="v">{formatNumber(result?.adm ?? NaN, 2)}</span>
+          </div>
+          <div className="row">
+            <span className="k">PASSIVO</span>
+            <span className="v">{formatNumber(result?.passivo ?? NaN, 2)}</span>
+          </div>
+          <div className="row">
+            <span className="k">IOF - TRIBUTOS</span>
+            <span className="v">
+              {formatNumber(result?.iofTributos ?? NaN, 2)}
+            </span>
+          </div>
+          <div className="row">
+            <span className="k">RESULTADO CLIENTE</span>
+            <span className="v">
+              {formatNumber(result?.resultadoCliente ?? NaN, 2)}
+            </span>
+          </div>
+        </div>
+
+        {!canCalc && (
+          <p className="muted" style={{ marginTop: 8 }}>
+            Preencha Itens e Itens Rastreados para ver os resultados.
           </p>
         )}
       </section>
