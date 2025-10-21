@@ -31,7 +31,6 @@ export default function App() {
   return (
     <div className="container">
       <h1>Calculadora de Viabilidade</h1>
-      <p className="subtitle">MVP — Itens e Itens Rastreados</p>
 
       <form
         className="form"
