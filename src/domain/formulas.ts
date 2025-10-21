@@ -1,23 +1,14 @@
 // src/domain/formulas.ts
 /**
- * Mapas e hipóteses:
- * - a = Itens
- * - b = Itens Rastreados
- *
- * Fórmulas:
- * - FATURAMENTO BRUTO     = ticketMedio * a
- * - CUSTO TAG             = J10 * b
- * - GESTÃO GO SEGUROS     = J13 * faturamentoBruto
- * - ASSISTÊNCIA 24 HORAS  = J12 * faturamentoBruto
- * - SETUP / CAUÇÃO / MÊS  = J14 * faturamentoBruto
- * - ADM                   = P16 * faturamentoBruto
- * - IOF - TRIBUTOS        = A1 * faturamentoBruto
- * - RESULTADO CLIENTE     = faturamentoBruto - (custos acima)
+ * a = Itens
+ * b = Itens Rastreados
+ * ticketMedio = Ticket Médio (editável no app)
  */
 
 export type Inputs = {
   a: number; // Itens
   b: number; // Itens Rastreados
+  ticketMedio: number; // Ticket Médio (decimal)
 };
 
 export type Result = {
@@ -28,6 +19,7 @@ export type Result = {
   assistencia24h: number;
   setupCaucaoMes: number;
   adm: number;
+  passivo: number;
   iofTributos: number;
   resultadoCliente: number;
 };
@@ -39,16 +31,10 @@ const J13 = 0.1249; // 12,49%
 const J14 = 0.3481; // 34,81%
 const A1 = 0.04; // 4%
 
-// ADM (P16) confirmado: 2,43%
+// ADM (P16): 2,43%
 const P16_ADM = 0.0243;
 
-// Ticket Médio fixo (E11)
-const TICKET_MEDIO_BASE = 158;
-
-export function computeViability({ a, b }: Inputs): Result {
-  // Ticket Médio
-  const ticketMedio = Number(TICKET_MEDIO_BASE);
-
+export function computeViability({ a, b, ticketMedio }: Inputs): Result {
   // Faturamento Bruto = Ticket Médio * Itens
   const faturamentoBruto = Number(ticketMedio * a);
 
@@ -58,9 +44,13 @@ export function computeViability({ a, b }: Inputs): Result {
   const assistencia24h = Number(J12 * faturamentoBruto);
   const setupCaucaoMes = Number(J14 * faturamentoBruto);
   const adm = Number(P16_ADM * faturamentoBruto);
+
+  // Passivo = 10% do faturamento bruto
+  const passivo = Number(0.1 * faturamentoBruto);
+
   const iofTributos = Number(A1 * faturamentoBruto);
 
-  // Resultado do Cliente
+  // Mantendo fórmula original do "RESULTADO CLIENTE" (não inclui PASSIVO)
   const resultadoCliente = Number(
     faturamentoBruto -
       custoTag -
@@ -79,6 +69,7 @@ export function computeViability({ a, b }: Inputs): Result {
     assistencia24h,
     setupCaucaoMes,
     adm,
+    passivo,
     iofTributos,
     resultadoCliente,
   };

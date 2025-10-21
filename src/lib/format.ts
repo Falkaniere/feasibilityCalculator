@@ -8,9 +8,30 @@ export function parseInteger(raw: string): number {
   if (!s) return NaN;
   // Normaliza: remove milhar e troca vírgula por ponto
   const normalized = s.replace(/\./g, '').replace(',', '.');
-  const n = Number(normalized);
+  const n = Number(normalized.replace(/[^\d.-]/g, ''));
   if (!Number.isFinite(n)) return NaN;
   return Math.trunc(n);
+}
+
+/** Converte string para número decimal respeitando variações de pt-BR. */
+export function parseDecimal(raw: string): number {
+  if (raw == null) return NaN;
+  let s = String(raw).trim();
+  if (!s) return NaN;
+  // Remove símbolos não numéricos (ex.: R$, espaços)
+  s = s.replace(/[^\d.,-]/g, '');
+  const hasDot = s.includes('.');
+  const hasComma = s.includes(',');
+
+  if (hasDot && hasComma) {
+    // Assume '.' como milhar e ',' como decimal: 1.234,56 -> 1234.56
+    s = s.replace(/\./g, '').replace(',', '.');
+  } else if (hasComma) {
+    // Apenas vírgula -> decimal
+    s = s.replace(',', '.');
+  }
+  const n = Number(s);
+  return Number.isFinite(n) ? n : NaN;
 }
 
 /** Formata número com casas decimais no locale pt-BR. */
