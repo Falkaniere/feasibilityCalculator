@@ -139,10 +139,10 @@ export default function App() {
             <span className="k">ADM</span>
             <span className="v">{formatNumber(result?.adm ?? NaN, 2)}</span>
           </div>
-          <div className="row">
+          {/* <div className="row">
             <span className="k">PASSIVO</span>
             <span className="v">{formatNumber(result?.passivo ?? NaN, 2)}</span>
-          </div>
+          </div> */}
           <div className="row">
             <span className="k">IOF - TRIBUTOS</span>
             <span className="v">
