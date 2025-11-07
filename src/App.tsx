@@ -3,7 +3,8 @@ import React, { useMemo, useState } from 'react';
 import Input from './components/Input';
 import { parseInteger, formatNumber, parseDecimal } from './lib/format';
 import { computeViability } from './domain/formulas';
-import logo from './assets/GO_360.svg';
+// import logo from './assets/GO_360.svg';
+import logo from './assets/new_logo.png';
 
 const logoSrc = `${logo}#toolbar=0&navpanes=0&scrollbar=0&view=FitH&zoom=page-width`;
 
