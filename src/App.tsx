@@ -16,7 +16,7 @@ export default function App() {
 
   // a = Itens, b = Itens Rastreados (inteiros)
   const a = useMemo(() => parseInteger(aRaw), [aRaw]);
-  const b = useMemo(() => parseInteger(bRaw), [bRaw]);
+  // const b = useMemo(() => parseInteger(bRaw), [bRaw]);
 
   const tmParsed = useMemo(() => {
     if (tmRaw.trim() === '') return 0;
@@ -28,18 +28,19 @@ export default function App() {
     const e: Record<string, string | undefined> = {};
     if (touched) {
       if (!isFinite(a)) e.a = 'Informe um inteiro válido';
-      if (!isFinite(b)) e.b = 'Informe um inteiro válido';
+      // if (!isFinite(b)) e.b = 'Informe um inteiro válido';
       if (tmRaw.trim() !== '' && !Number.isFinite(parseDecimal(tmRaw))) {
         e.tm = 'Informe um número válido';
       }
     }
     return e;
-  }, [a, b, tmRaw, touched]);
+  }, [a, tmRaw, touched]);
 
-  const canCalc = isFinite(a) && isFinite(b);
+  // const canCalc = isFinite(a) && isFinite(b);
+  const canCalc = isFinite(a);
   const result = useMemo(
-    () => (canCalc ? computeViability({ a, b, ticketMedio: tmParsed }) : null),
-    [a, b, tmParsed, canCalc]
+    () => (canCalc ? computeViability({ a, ticketMedio: tmParsed }) : null),
+    [a, tmParsed, canCalc]
   );
 
   return (
@@ -70,7 +71,7 @@ export default function App() {
             aria-invalid={!!errors.a}
           />
 
-          <Input
+          {/* <Input
             label="Itens Rastreados"
             placeholder="Ex.: 250"
             inputMode="numeric"
@@ -80,7 +81,7 @@ export default function App() {
             onBlur={() => setTouched(true)}
             error={errors.b}
             aria-invalid={!!errors.b}
-          />
+          /> */}
         </div>
       </form>
 
@@ -112,34 +113,32 @@ export default function App() {
               {formatNumber(result?.faturamentoBruto ?? NaN, 2)}
             </span>
           </div>
-          <div className="row">
+          {/* <div className="row">
             <span className="k">CUSTO TAG</span>
             <span className="v">
               {formatNumber(result?.custoTag ?? NaN, 2)}
             </span>
+          </div> */}
+          <div className="row">
+            <span className="k">APÓLICE</span>
+            <span className="v">{formatNumber(result?.apolice ?? NaN, 2)}</span>
           </div>
           <div className="row">
-            <span className="k">GESTÃO GO SEGUROS</span>
+            <span className="k">GESTÃO / ADM NEW</span>
             <span className="v">
-              {formatNumber(result?.gestaoGoSeguros ?? NaN, 2)}
+              {formatNumber(result?.gestaoAdmNew ?? NaN, 2)}
             </span>
           </div>
           <div className="row">
-            <span className="k">ASSISTÊNCIA 24 HORAS</span>
+            <span className="k">ASSISTENCIA 24 HORAS</span>
             <span className="v">
               {formatNumber(result?.assistencia24h ?? NaN, 2)}
             </span>
           </div>
-          <div className="row">
-            <span className="k">SETUP / CAUÇÃO / MÊS</span>
-            <span className="v">
-              {formatNumber(result?.setupCaucaoMes ?? NaN, 2)}
-            </span>
-          </div>
-          <div className="row">
-            <span className="k">ADM</span>
-            <span className="v">{formatNumber(result?.adm ?? NaN, 2)}</span>
-          </div>
+          {/* <div className="row">
+            <span className="k">IOF TRIBUTOS</span>
+            <span className="v">{formatNumber(result?.iofTributos ?? NaN, 2)}</span>
+          </div> */}
           {/* <div className="row">
             <span className="k">PASSIVO</span>
             <span className="v">{formatNumber(result?.passivo ?? NaN, 2)}</span>
@@ -150,7 +149,7 @@ export default function App() {
               {formatNumber(result?.iofTributos ?? NaN, 2)}
             </span>
           </div>
-          <div className="row">
+          <div className="row" style={{ fontSize: '2.00rem', fontWeight: 700 }}>
             <span className="k">RESULTADO CLIENTE</span>
             <span className="v">
               {formatNumber(result?.resultadoCliente ?? NaN, 2)}
